@@ -1,17 +1,20 @@
 import pictures from './gallery-items.js';
 
  const galleryImagesEl = document.querySelector('.js-gallery');
-// console.log(galleryImagesEl);
-const makeGalleryPicturesMarkup = createPicturesMarkup(pictures);
- 
+ const makeGalleryPicturesMarkup = createPicturesMarkup(pictures);
 galleryImagesEl.insertAdjacentHTML('beforeend', makeGalleryPicturesMarkup);
 
-galleryImagesEl.addEventListener('click', onGalleryPicturecClick);
-
-console.log(createPicturesMarkup(pictures));
+const refs = {
+    overlayEl: document.querySelector('.lightbox'),
+    backdropEl: document.querySelector('.lightbox__overlay'),
+    lightBoxImageEl: document.querySelector('.lightbox__image'),
+  closeBtn: document.querySelector('[data-action="close-lightbox"]')
+} 
+console.log(refs.closeBtn);
 
  function createPicturesMarkup(pictures) {
    return pictures.map(({ preview, original, description }) => {
+     
      return `
   <li class="gallery__item">
     <a
@@ -27,41 +30,25 @@ console.log(createPicturesMarkup(pictures));
 </li>
  `;
    }).join('');
-  }
-
-function onGalleryPicturecClick(e) {
-  const galleryLinkEl = e.target.classList.contains('gallery__link');
-  if (!galleryLinkEl) {
+  }       
+    
+function onGalleryPictureClick(e) {
+  e.preventDefault(); 
+  console.log(e.target.dataset.source);
+  
+  const galleryLinkEl = e.target.nodeName;
+  if (galleryLinkEl !== 'IMG') {
     return;
   }
-  const currentPicture = document.querySelector('.gallery__link.is-open')
+  refs.overlayEl.classList.remove('is-open')
+  refs.overlayEl.classList.add('is-open')
+  const currentImage = e.target;  
+  refs.lightBoxImageEl.setAttribute("src", currentImage.dataset.source);
+  refs.lightBoxImageEl.setAttribute("alt", currentImage.alt);
+}
+galleryImagesEl.addEventListener('click', onGalleryPictureClick)
 
-  if (currentPicture) {
-    currentPicture.classList.remove('is-open')
-  }
-
-  const linkEl = e.target;
-  const parentGalleryLink = linkEl.closest('.gallery__link');
-
-  parentGalleryLink.classList.add('is-open');
-  
-  }
- 
-
-
-
-
-
-
-// const refs = {
-//   overlayEl: document.querySelector('lightbox'),
-//   closeBtn: document.querySelector('[data-action="close-lightbox"]')
-// }  
-
-// refs.overlayEl.addEventListener('click', onLightBoxClose);
-
-// function onLightBoxClose(e) {
-//  e.target.classList.add('is-open');
-// }
-
-
+function onCloseBtn() {
+refs.overlayEl.classList.remove('is-open')
+}
+refs.closeBtn.addEventListener('click', onCloseBtn);
